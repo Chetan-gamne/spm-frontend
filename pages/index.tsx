@@ -12,7 +12,7 @@ export default function Home() {
       </Head>
       <div className={styles.main}>
         <h1>Hello Welcome to SPM</h1>
-        <Button variant="contained" href="/login">
+        <Button variant="contained" href="/signIn">
           Login In
         </Button>
       </div>

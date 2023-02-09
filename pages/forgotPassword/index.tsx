@@ -62,7 +62,7 @@ function forgotPassword() {
             This is a success alert — check it out!
           </Alert>
         )}
-        <Link href="/login" variant="body2">
+        <Link href="/signIn" variant="body2">
           Back To Login
         </Link>
       </Container>
