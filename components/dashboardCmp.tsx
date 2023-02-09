@@ -17,9 +17,12 @@ import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { mainListItems, secondaryListItems } from "../components/listitems";
-import Deposits from "../components/Deposits";
-import Orders from "../components/Orders";
+import { mainListItems, secondaryListItems } from "./listitems";
+import Deposits from "./Deposits";
+import Orders from "./Orders";
+import { useRouter } from "next/router";
+import { gql, useQuery } from "@apollo/client";
+// data?.me?.email
 
 const drawerWidth: number = 240;
 
@@ -31,6 +34,7 @@ const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })<AppBarProps>(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
+  position: "absolute",
   transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -51,6 +55,7 @@ const Drawer = styled(MuiDrawer, {
   "& .MuiDrawer-paper": {
     whiteSpace: "nowrap",
     width: drawerWidth,
+    position: "absolute",
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -72,7 +77,7 @@ const Drawer = styled(MuiDrawer, {
 
 const mdTheme = createTheme();
 
-function DashboardContent() {
+function DashboardContent({ email }) {
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -80,7 +85,7 @@ function DashboardContent() {
 
   return (
     <ThemeProvider theme={mdTheme}>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", position: "relative" }}>
         <CssBaseline />
         <AppBar open={open}>
           <Toolbar
@@ -162,6 +167,7 @@ function DashboardContent() {
                   }}
                 >
                   {/* <Chart /> */}
+                  <p>{email ? email : "User"}</p>
                 </Paper>
               </Grid>
               {/* Recent Deposits */}
@@ -192,5 +198,31 @@ function DashboardContent() {
 }
 
 export default function Dashboard() {
-  return <DashboardContent />;
+  const [user, setUser] = React.useState(null);
+  const router = useRouter();
+  const meQuery = gql`
+    query {
+      me {
+        email
+        uid
+        email_verified
+        phone_number
+      }
+    }
+  `;
+  const { error, data, loading } = useQuery(meQuery);
+  if (loading) {
+    return <div>Loading Dashboard..</div>;
+  }
+
+  if (error) {
+    router.push("/login");
+    console.error(error);
+    return null;
+  }
+
+  if (data) {
+    console.log(data);
+  }
+  return <DashboardContent email={data?.me?.email} />;
 }

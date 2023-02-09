@@ -10,7 +10,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { auth, signInWithEmailAndPassword } from "../services/firebase";
+import { auth, signInWithEmailAndPassword } from "../../services/firebase";
 import CircularProgress from "@mui/material/CircularProgress";
 function Copyright(props: any) {
   return (
@@ -38,15 +38,15 @@ export default function SignIn() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     setLoader(true);
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    let user = { email: data.get("email"), password: data.get("password") };
+    // let user = { email: data.get("email"), password: data.get("password") };
     try {
+      const data = new FormData(event.currentTarget);
       const result = await signInWithEmailAndPassword(
         auth,
-        user.email,
-        user.password
+        data.get("email") as string,
+        data.get("password") as string
       );
-      const token = await result.user?.accessToken;
+      const token = (await result.user?.accessToken!) ?? "";
 
       const res = await fetch("http://localhost:3001/auth/login", {
         method: "post",
@@ -55,8 +55,7 @@ export default function SignIn() {
         },
         credentials: "include",
       });
-      const data = await res.json();
-      window.location.href = "/dash";
+      window.location.href = "/dashboard";
       setLoader(false);
     } catch (error) {
       console.log(error);
@@ -73,6 +72,7 @@ export default function SignIn() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            height: "100%",
           }}
         >
           <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
@@ -117,7 +117,7 @@ export default function SignIn() {
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="/signup" variant="body2">
+                <Link href="/signUp" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>

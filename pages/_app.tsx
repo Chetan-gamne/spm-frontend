@@ -7,10 +7,11 @@ import { CacheProvider, EmotionCache } from "@emotion/react";
 import theme from "../config/theme";
 import createEmotionCache from "../config/createEmotionCache";
 import { ApolloProvider } from "@apollo/client";
-
+import { useRouter } from "next/router";
 import client from "../services/apollo-client";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
+import { Box } from "@mui/material";
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -33,6 +34,7 @@ const sections = [
 
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
+  const router = useRouter();
   return (
     <ApolloProvider client={client}>
       <CacheProvider value={emotionCache}>
@@ -40,10 +42,20 @@ export default function MyApp(props: MyAppProps) {
           <meta name="viewport" content="initial-scale=1, width=device-width" />
         </Head>
         <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Header sections={sections} title="SPM" />
-          <Component {...pageProps} />
-          <Footer />
+          <Box
+            sx={{
+              minHeight: "100%",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <CssBaseline />
+            {!["/login", "/signup"].includes(router.pathname) && (
+              <Header sections={sections} title="SPM" />
+            )}
+            <Component {...pageProps} />
+            {/* <Footer /> */}
+          </Box>
         </ThemeProvider>
       </CacheProvider>
     </ApolloProvider>
